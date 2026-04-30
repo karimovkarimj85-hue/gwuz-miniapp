@@ -1,0 +1,19 @@
+.text-type {
+  display: inline-block;
+}
+
+.text-type__content {
+  display: inline;
+}
+
+.text-type__cursor {
+  display: inline-block;
+  opacity: 1;
+  margin-left: 1px;
+  font-weight: 300;
+  color: var(--muted, #888);
+}
+
+.text-type__cursor--hidden {
+  visibility: hidden;
+}
