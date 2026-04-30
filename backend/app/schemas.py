@@ -79,6 +79,7 @@ class UserOut(BaseModel):
 
 class HealthOut(BaseModel):
     status: str
+    bot_token_configured: bool = False
 
 
 class SpecOut(BaseModel):
