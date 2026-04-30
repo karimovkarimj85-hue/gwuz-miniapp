@@ -52,7 +52,6 @@ def _require_env() -> None:
         raise SystemExit("WEBAPP_URL должен быть HTTPS для Telegram Mini App")
 
 
-bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 
@@ -73,6 +72,7 @@ async def cmd_start(message: Message) -> None:
 
 async def main() -> None:
     _require_env()
+    bot = Bot(token=BOT_TOKEN)
     print("Бот GWuz запущен. WebApp:", WEBAPP_URL)
     await dp.start_polling(bot)
 

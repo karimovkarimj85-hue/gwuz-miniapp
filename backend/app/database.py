@@ -5,16 +5,44 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 
 class Base(DeclarativeBase):
     pass
 
 
-engine = create_async_engine(
-    settings.database_url,
-    echo=False,
-)
+def get_engine():
+    db_url = settings.database_url
+
+    # Нормализация для Windows/ENV: иногда теряется один слеш в sqlite URL.
+    if db_url.startswith("sqlite+aiosqlite:/./"):
+        db_url = db_url.replace("sqlite+aiosqlite:/", "sqlite+aiosqlite:///", 1)
+
+    # SQLite не требует спец. обработки query-параметров sslmode.
+    if db_url.startswith("sqlite"):
+        return create_async_engine(db_url, echo=False)
+
+    # asyncpg не понимает query params sslmode/channel_binding
+    parsed = urlparse(db_url)
+    params = parse_qs(parsed.query)
+    sslmode = (params.get("sslmode", [""])[0] or "").lower()
+    ssl_required = sslmode in ("require", "verify-full", "verify_ca", "verify-ca")
+
+    clean_params = {k: v[0] for k, v in params.items() if k not in ("sslmode", "channel_binding")}
+    clean_url = urlunparse(parsed._replace(query=urlencode(clean_params)))
+
+    connect_args = {}
+    if ssl_required:
+        import ssl
+
+        ssl_ctx = ssl.create_default_context()
+        connect_args["ssl"] = ssl_ctx
+
+    return create_async_engine(clean_url, connect_args=connect_args, echo=False)
+
+
+engine = get_engine()
 async_session_factory = async_sessionmaker(
     engine,
     expire_on_commit=False,
