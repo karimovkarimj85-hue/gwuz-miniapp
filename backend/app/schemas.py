@@ -81,6 +81,8 @@ class HealthOut(BaseModel):
     status: str
     bot_token_configured: bool = False
     token_length: int = 0
+    env_has_TELEGRAM_BOT_TOKEN: bool = False
+    env_has_telegram_bot_token: bool = False
 
 
 class SpecOut(BaseModel):
