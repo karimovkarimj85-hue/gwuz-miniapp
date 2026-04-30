@@ -9,16 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.config import parse_origins, settings
+from app.config import log_startup_settings, parse_origins, settings
 from app.database import init_models
 from app.routers import auth, health, meta, profile
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Диагностика в логах (без вывода секретов)
-    print("env: bot_token_configured =", bool((settings.telegram_bot_token or "").strip()))
-    print("env: database_url_scheme =", (settings.database_url or "").split(":", 1)[0] if settings.database_url else "")
+    log_startup_settings()
     await init_models()
     yield
 

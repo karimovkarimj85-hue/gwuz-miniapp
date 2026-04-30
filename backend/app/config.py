@@ -25,8 +25,9 @@ class Settings(BaseSettings):
         default="change-me",
         validation_alias=AliasChoices("JWT_SECRET", "jwt_secret"),
     )
+    # В проде (Railway) DATABASE_URL обязателен. Локально задаётся в корневом .env.
     database_url: str = Field(
-        default="sqlite+aiosqlite:///./data/gw.sqlite",
+        ...,
         validation_alias=AliasChoices("DATABASE_URL", "database_url"),
     )
     cors_origins: str = Field(
@@ -42,3 +43,10 @@ def parse_origins(raw: str) -> list[str]:
 
 
 settings = Settings()
+
+
+def log_startup_settings() -> None:
+    # Диагностика в логах (без вывода секретов)
+    print(f"env: bot_token_configured = {bool((settings.telegram_bot_token or '').strip())}")
+    scheme = (settings.database_url or "").split(":", 1)[0] if settings.database_url else ""
+    print(f"env: database_url_scheme = {scheme}")
