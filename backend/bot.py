@@ -22,6 +22,16 @@ load_dotenv(_REPO / ".env")
 BOT_TOKEN = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip()
 WEBAPP_URL = (os.getenv("WEBAPP_URL") or "").strip()
 
+
+def _normalize_webapp_url(raw: str) -> str:
+    u = (raw or "").strip()
+    if not u:
+        return ""
+    if u.startswith("http://") or u.startswith("https://"):
+        return u
+    # BotFather требует https, поэтому помогаем если забыли схему.
+    return f"https://{u.lstrip('/')}"
+
 WELCOME_HTML = (
     "🔹 <b>Добро пожаловать в GWuz</b>\n\n"
     "Мы помогаем <b>работодателям</b> находить исполнителей, а людям — надёжные смены и понятные "
@@ -34,8 +44,12 @@ WELCOME_HTML = (
 def _require_env() -> None:
     if not BOT_TOKEN:
         raise SystemExit("Задайте TELEGRAM_BOT_TOKEN в корневом .env")
+    global WEBAPP_URL
+    WEBAPP_URL = _normalize_webapp_url(WEBAPP_URL)
     if not WEBAPP_URL:
         raise SystemExit("Задайте WEBAPP_URL (для Telegram — HTTPS, например из ngrok)")
+    if not WEBAPP_URL.startswith("https://"):
+        raise SystemExit("WEBAPP_URL должен быть HTTPS для Telegram Mini App")
 
 
 bot = Bot(token=BOT_TOKEN)
