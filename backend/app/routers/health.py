@@ -8,4 +8,5 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthOut)
 async def health() -> HealthOut:
-    return HealthOut(status="ok", bot_token_configured=bool((settings.telegram_bot_token or "").strip()))
+    tok = (settings.telegram_bot_token or "").strip()
+    return HealthOut(status="ok", bot_token_configured=bool(tok), token_length=len(tok))

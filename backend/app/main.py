@@ -9,14 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.config import log_startup_settings, parse_origins, settings
+from app.config import log_env_status, parse_origins, settings
 from app.database import init_models
 from app.routers import auth, health, meta, profile
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    log_startup_settings()
+    log_env_status()
     await init_models()
     yield
 
