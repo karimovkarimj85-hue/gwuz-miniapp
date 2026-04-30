@@ -16,6 +16,9 @@ from app.routers import auth, health, meta, profile
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    # Диагностика в логах (без вывода секретов)
+    print("env: bot_token_configured =", bool((settings.telegram_bot_token or "").strip()))
+    print("env: database_url_scheme =", (settings.database_url or "").split(":", 1)[0] if settings.database_url else "")
     await init_models()
     yield
 
