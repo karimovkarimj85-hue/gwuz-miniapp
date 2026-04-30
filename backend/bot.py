@@ -17,7 +17,7 @@ from aiogram.types import (
 from dotenv import load_dotenv
 
 _REPO = Path(__file__).resolve().parent.parent
-load_dotenv(_REPO / ".env")
+load_dotenv(_REPO / ".env", override=False)
 
 BOT_TOKEN = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip()
 WEBAPP_URL = (os.getenv("WEBAPP_URL") or "").strip()
@@ -71,6 +71,9 @@ async def cmd_start(message: Message) -> None:
 
 
 async def main() -> None:
+    token_raw = os.getenv("TELEGRAM_BOT_TOKEN", "") or ""
+    print(f"[BOT] token length from env: {len(token_raw)}")
+    print(f"[BOT] BOT_TOKEN length: {len(BOT_TOKEN)}")
     _require_env()
     bot = Bot(token=BOT_TOKEN)
     print("Бот GWuz запущен. WebApp:", WEBAPP_URL)
