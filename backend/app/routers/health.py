@@ -10,7 +10,7 @@ router = APIRouter()
 @router.get("/health")
 async def health():
     raw_token = os.environ.get("TELEGRAM_BOT_TOKEN", "NOT_FOUND")
-    tok = (settings.telegram_bot_token or "").strip()
+    tok = settings.telegram_bot_token or ""
     return {
         "status": "ok",
         "bot_token_configured": bool(tok),
