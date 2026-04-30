@@ -3,18 +3,18 @@ from fastapi import APIRouter
 import os
 
 from app.config import settings
-from app.schemas import HealthOut
 
 router = APIRouter()
 
 
-@router.get("/health", response_model=HealthOut)
-async def health() -> HealthOut:
+@router.get("/health")
+async def health():
+    raw_token = os.environ.get("TELEGRAM_BOT_TOKEN", "NOT_FOUND")
     tok = (settings.telegram_bot_token or "").strip()
-    return HealthOut(
-        status="ok",
-        bot_token_configured=bool(tok),
-        token_length=len(tok),
-        env_has_TELEGRAM_BOT_TOKEN="TELEGRAM_BOT_TOKEN" in os.environ,
-        env_has_telegram_bot_token="telegram_bot_token" in os.environ,
-    )
+    return {
+        "status": "ok",
+        "bot_token_configured": bool(tok),
+        "token_length": len(tok),
+        "raw_env_token_length": len(raw_token),
+        "raw_env_found": raw_token != "NOT_FOUND",
+    }
